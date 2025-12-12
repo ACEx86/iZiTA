@@ -406,11 +406,11 @@ namespace iZiTA
                             {
                                 echo PHP_EOL.' [ + ] ( Shadow_Control_Flow_Tokens )       TOKEN ENROLLED: '.$Set_Shadow_Control_Flow_Token;
                                 unset($this->Shadow_Control_Flow_Tokens[';']);
-                                // Propable error with isset
                                 $this->Shadow_Control_Flow_Tokens[] = $Set_Shadow_Control_Flow_Token;
                             }
                         }else
-                        {# Locks the execution on error.
+                        {
+                            unset($this->Shadow_Control_Flow_Tokens[';']);
                             echo PHP_EOL.' [ ! ] ( Shadow_Control_Flow_Tokens )       Error writing tokens.';
                         }
                     }else
@@ -804,7 +804,7 @@ namespace iZiTA
                                 unset($tmp_void);
                             }
                             $is_Shadow = '';
-                            $is_Shadow = isset($this->Shadow_Control_Flow_Database[$is_script_depth][$Current_Script_Access][$is_sub_script_depth]['READ_EXECUTION_TOKEN']['OK_READ_EXEC_TOKEN:']) ?: False;
+                            $is_Shadow = isset($this->Shadow_Control_Flow_Database[$is_script_depth][$Current_Script_Access][$is_sub_script_depth]['READ_EXECUTION_TOKEN']['OK_READ_EXEC_TOKEN:']);
                             $is_Shadow_Text = $this->Shadow_Control_Flow_Database[$is_script_depth][$Current_Script_Access][$is_sub_script_depth]['READ_EXECUTION_TOKEN']['OK_READ_EXEC_TOKEN:'] ?: $is_Shadow_Text = False;
                             if($is_Shadow === True and is_string($is_Shadow_Text) === True and empty($is_Shadow_Text) === True)
                             {# Set execution token for the action
@@ -1008,7 +1008,7 @@ namespace iZiTA
                 {
                     $OK_MESSAGE = '';
                     $OK_MESSAGE = ($this->Control_Flow_Database[$get_ScriptDepth][$get_Current_Script_Access][$get_Sub_Script_Depth][$Action] ?? '') ?: $OK_MESSAGE = '';
-                    if(isset($OK_MESSAGE) === True and empty($OK_MESSAGE) === False and is_string($OK_MESSAGE) === True and strlen($OK_MESSAGE) === 64 and isset($this->Shadow_Control_Flow_Database[$get_ScriptDepth][$get_Current_Script_Access][$get_Sub_Script_Depth][$Action][$OK_MESSAGE]) === True and empty($this->Shadow_Control_Flow_Database[$get_ScriptDepth][$get_Current_Script_Access][$get_Sub_Script_Depth][$Action][$OK_MESSAGE]) === True and isset($this->Shadow_Control_Flow_Tokens[$Execution_Token]) === False)
+                    if(isset($OK_MESSAGE) === True and empty($OK_MESSAGE) === False and is_string($OK_MESSAGE) === True and strlen($OK_MESSAGE) < 50 and isset($this->Shadow_Control_Flow_Database[$get_ScriptDepth][$get_Current_Script_Access][$get_Sub_Script_Depth][$Action][$OK_MESSAGE]) === True and empty($this->Shadow_Control_Flow_Database[$get_ScriptDepth][$get_Current_Script_Access][$get_Sub_Script_Depth][$Action][$OK_MESSAGE]) === True and isset($this->Shadow_Control_Flow_Tokens[$Execution_Token]) === False)
                     {
                         $temp_token = '';
                         $temp_token = $this->GenerateHash() ?: $temp_token = '';
