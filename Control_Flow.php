@@ -24,6 +24,7 @@ namespace iZiTA
      * iZiTA::Control_Flow<br>
      * Script version: 25.12.0.55<br>
      * PHP Version: 8.5<br>
+     * Details: iZiTA::Control Flow is a library to manage execution and variable reads/writes based on access, usage state and execution.
      * @package iZiTA::Control_Flow
      * @author : TheTimeAuthority
      */
