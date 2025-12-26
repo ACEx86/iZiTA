@@ -22,7 +22,7 @@ namespace iZiTA
     //</editor-fold>
     /**
      * iZiTA::Control_Flow<br>
-     * Script version: 25.12.0.60<br>
+     * Script version: 25.12.0.61<br>
      * PHP Version: 8.5<br>
      * Details: iZiTA::Control Flow is a library to manage execution and variable reads/writes based on access, usage state and execution.
      * @package iZiTA::Control_Flow
@@ -99,17 +99,16 @@ namespace iZiTA
                         $Load_Token_Database = '';
                         $Load_Token_Database = (file_get_contents($Token_Database_Path) ?? '') ?: ($Load_Token_Database = '');
                         $Token_Database_Path = '';
+                        unset($Token_Database_Path);
                         if(empty($Load_Token_Database) === False and is_string($Load_Token_Database) === True and mb_detect_encoding($Load_Token_Database, 'UTF-8', true) === 'UTF-8' and str_contains($Load_Token_Database, '.') === True)
                         {#  . | ; =
                             $Load_Token_Database = preg_replace("/[^A-Z_|=:;.]/", '', $Load_Token_Database) ?: $Load_Token_Database = '';
-                            $is_Script_Depth = 0;
-                            $is_Script_Depth = substr_count($Load_Token_Database, '.') ?: $is_Script_Depth = -1;
                             $Load_Token_Database = (explode('.', $Load_Token_Database) ?? '') ?: $Load_Token_Database = '';
                             $Control_Flow_Database = [];
                             $Positive_X = 0;
                             foreach($Load_Token_Database as $Current_Script_Depth)
                             {# Build Control_Flow_Database from the provided data. ( . is the Script_Depth )     ( explode | [0] is $Current_Script_Access )     ( Sub_Script_Depth is ; )
-                                if($Current_Script_Depth === '')
+                                if($Current_Script_Depth === '' or empty($Current_Script_Depth))
                                 {
                                     continue;
                                 }
@@ -118,7 +117,6 @@ namespace iZiTA
                                 $Other_Actions = '';
                                 $Equals_Sign_Key = '';
                                 $Equals_Sign_Value = '';
-                                $is_not_nothing = '';
                                 [$Current_Action, $Other_Actions] = (explode('|', $Current_Script_Depth, 2) ?? '') ?: ($Current_Action = '')($Other_Actions = '');
                                 if(empty($Current_Action) === False)
                                 {
@@ -127,12 +125,12 @@ namespace iZiTA
                                 if(empty($Other_Actions) === False)
                                 {
                                     $Other_Actions = (preg_replace("/[^A-Z_=:;]/", '', $Other_Actions) ?? '') ?: $Other_Actions = '';
-                                    $Equals_Sign_Key = explode('=', $Other_Actions, 1)[0] ?: $Equals_Sign_Key = '';
-                                    $Equals_Sign_Value = explode('=', $Other_Actions, 2)[1] ?: $Equals_Sign_Value = '';
+                                    $Equals_Sign_Key = (explode('=', $Other_Actions, 1)[0] ?? '') ?: $Equals_Sign_Key = '';
+                                    $Equals_Sign_Value = (explode('=', $Other_Actions, 2)[1] ?? '') ?: $Equals_Sign_Value = '';
                                 }
                                 $is_valid_entry = false;
                                 # # # END Struct
-                                if(empty($Current_Script_Depth) === False and empty($Current_Action) === False and empty($Other_Actions) === False and empty($Equals_Sign_Value) === False and isset($Equals_Sign_Value[0]) === True and isset($Equals_Sign_Value[1]) === True and $Equals_Sign_Value[strlen($Equals_Sign_Value)-1] === ';')
+                                if(empty($Current_Script_Depth) === False and empty($Current_Action) === False and empty($Other_Actions) === False and isset($Equals_Sign_Key[0]) === True and isset($Equals_Sign_Value[0]) === True and isset($Equals_Sign_Value[1]) === True and $Equals_Sign_Value[strlen($Equals_Sign_Value)-1] === ';')
                                 {# Validates execution control flow database
                                     $Other_Actions = (explode(';', $Other_Actions) ?? '') ?: $Other_Actions = '';
                                     foreach($Other_Actions as $Other_Action)
@@ -161,8 +159,6 @@ namespace iZiTA
                             unset($Positive_X);
                             $Load_Token_Database = [];
                             unset($Load_Token_Database);
-                            $Script_Depth = 0;
-                            unset($Script_Depth);
                             if(empty($Control_Flow_Database) === False and is_array($Control_Flow_Database) === True)
                             {
                                 $OK_Status = $Control_Flow_Database;
