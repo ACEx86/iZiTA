@@ -22,7 +22,7 @@ namespace iZiTA
     //</editor-fold>
     /**
      * iZiTA::Control_Flow<br>
-     * Script version: 25.12.0.57<br>
+     * Script version: 25.12.0.60<br>
      * PHP Version: 8.5<br>
      * Details: iZiTA::Control Flow is a library to manage execution and variable reads/writes based on access, usage state and execution.
      * @package iZiTA::Control_Flow
@@ -80,7 +80,7 @@ namespace iZiTA
                     $Token_Database_Path_Length = strlen($Token_Database_Path);
                     if($Token_Database_Path_Length > 5)
                     {# Get extension from the path string
-                        $Token_Database_Path_Extension = $Token_Database_Path[$Token_Database_Path_Length-6].$Token_Database_Path[$Token_Database_Path_Length-5].$Token_Database_Path[$Token_Database_Path_Length-4].$Token_Database_Path[$Token_Database_Path_Length-3].$Token_Database_Path[$Token_Database_Path_Length-2].$Token_Database_Path[$Token_Database_Path_Length-1];
+                        $Token_Database_Path_Extension = ($Token_Database_Path[$Token_Database_Path_Length-6].$Token_Database_Path[$Token_Database_Path_Length-5].$Token_Database_Path[$Token_Database_Path_Length-4].$Token_Database_Path[$Token_Database_Path_Length-3].$Token_Database_Path[$Token_Database_Path_Length-2].$Token_Database_Path[$Token_Database_Path_Length-1] ?? '');
                     }
                     $Token_Database_Path_Length = 0;
                     unset($Token_Database_Path_Length);
@@ -104,40 +104,37 @@ namespace iZiTA
                             $Load_Token_Database = preg_replace("/[^A-Z_|=:;.]/", '', $Load_Token_Database) ?: $Load_Token_Database = '';
                             $is_Script_Depth = 0;
                             $is_Script_Depth = substr_count($Load_Token_Database, '.') ?: $is_Script_Depth = -1;
-                            $Load_Token_Database = explode('.', $Load_Token_Database) ?: $Load_Token_Database = '';
+                            $Load_Token_Database = (explode('.', $Load_Token_Database) ?? '') ?: $Load_Token_Database = '';
                             $Control_Flow_Database = [];
                             $Positive_X = 0;
-                            for($XSD = 0; $XSD < $is_Script_Depth; $XSD++)
+                            foreach($Load_Token_Database as $Current_Script_Depth)
                             {# Build Control_Flow_Database from the provided data. ( . is the Script_Depth )     ( explode | [0] is $Current_Script_Access )     ( Sub_Script_Depth is ; )
+                                if($Current_Script_Depth === '')
+                                {
+                                    continue;
+                                }
                                 # # # START Struct
-                                $is_valid_entry = false;
                                 $Current_Action = '';
                                 $Other_Actions = '';
                                 $Equals_Sign_Key = '';
                                 $Equals_Sign_Value = '';
                                 $is_not_nothing = '';
-                                $Current_Script_Depth = '';
-                                $Current_Script_Depth = ($Load_Token_Database[$XSD] ?? '') ?: ($Current_Script_Depth = '');
-                                if($Current_Script_Depth === '')
-                                {
-                                    continue;
-                                }
-                                $Current_Action = (explode('|', $Current_Script_Depth)[0] ?? '') ?: $Current_Action = '';
-                                $Other_Actions = (explode('|', $Current_Script_Depth)[1] ?? '') ?: $Other_Actions = '';
+                                [$Current_Action, $Other_Actions] = (explode('|', $Current_Script_Depth, 2) ?? '') ?: ($Current_Action = '')($Other_Actions = '');
                                 if(empty($Current_Action) === False)
                                 {
-                                    $Current_Action = preg_replace("/[^A-Z_]/", '', $Current_Action) ?: $Current_Action = '';
+                                    $Current_Action = (preg_replace("/[^A-Z_]/", '', $Current_Action)  ?? '') ?: $Current_Action = '';
                                 }
                                 if(empty($Other_Actions) === False)
                                 {
-                                    $Other_Actions = preg_replace("/[^A-Z_=:;]/", '', $Other_Actions) ?: $Other_Actions = '';
-                                    $Equals_Sign_Key = explode('=', $Other_Actions)[0] ?: $Equals_Sign_Key = '';
-                                    $Equals_Sign_Value = explode('=', $Other_Actions)[1] ?: $Equals_Sign_Value = '';
-                                    $is_not_nothing = explode(';', $Equals_Sign_Key)[0] ?: $is_not_nothing = '';
-                                } # # # END Struct
-                                if(empty($Current_Script_Depth) === False and empty($Current_Action) === False and empty($Other_Actions) === False and empty($Equals_Sign_Value) === False and empty($is_not_nothing) === False and empty(explode(';', $Equals_Sign_Value)[0]) === False)
+                                    $Other_Actions = (preg_replace("/[^A-Z_=:;]/", '', $Other_Actions) ?? '') ?: $Other_Actions = '';
+                                    $Equals_Sign_Key = explode('=', $Other_Actions, 1)[0] ?: $Equals_Sign_Key = '';
+                                    $Equals_Sign_Value = explode('=', $Other_Actions, 2)[1] ?: $Equals_Sign_Value = '';
+                                }
+                                $is_valid_entry = false;
+                                # # # END Struct
+                                if(empty($Current_Script_Depth) === False and empty($Current_Action) === False and empty($Other_Actions) === False and empty($Equals_Sign_Value) === False and isset($Equals_Sign_Value[0]) === True and isset($Equals_Sign_Value[1]) === True and $Equals_Sign_Value[strlen($Equals_Sign_Value)-1] === ';')
                                 {# Validates execution control flow database
-                                    $Other_Actions = explode(';', $Other_Actions) ?: $Sub_Script_Depth = -1;
+                                    $Other_Actions = (explode(';', $Other_Actions) ?? '') ?: $Other_Actions = '';
                                     foreach($Other_Actions as $Other_Action)
                                     {
                                         $Sub_Action = '';
@@ -153,7 +150,7 @@ namespace iZiTA
                                     }
                                     if($is_valid_entry === True)
                                     {# Add array key index only if everything was valid.
-                                        $Positive_X += 1;
+                                        $Positive_X++;
                                     }
                                     $Current_Action = '';
                                     $Other_Actions = '';
