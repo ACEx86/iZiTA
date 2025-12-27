@@ -22,7 +22,7 @@ namespace iZiTA
     //</editor-fold>
     /**
      * iZiTA::Control_Flow<br>
-     * Script version: 25.12.0.62<br>
+     * Script version: 25.12.0.63<br>
      * PHP Version: 8.5<br>
      * Details: iZiTA::Control Flow is a library to manage execution and variable reads/writes based on access, usage state and execution.
      * @package iZiTA::Control_Flow
@@ -690,19 +690,17 @@ namespace iZiTA
                         if($Script_Depth > 0)
                         {
                             $Script_Depth_Minus = $Script_Depth - 1;
-                        }elseif ($Script_Depth === 0)
+                        }elseif($Script_Depth === 0)
                         {
                             $Sub_Depth_Start = 'fail';
                         }
-                        $Old_Script_Access = $this->Control_Flow_Database[$Script_Depth_Minus];
-                        $Old_Script_Access = ($this->Data->Array_To_String($Old_Script_Access, '#') ?? '');
-                        $Old_Script_Access = (explode('#', $Old_Script_Access)[0] ?? '');
+                        $Old_Script_Access = key(($this->Control_Flow_Database[$Script_Depth_Minus]) ?? 'FAIL');
                         /*
                          * If on the previous script depth on Control and Shadow Flow Databases no more sub script depth exist
                          * and on current Shadow the first script depth does not exist THEN PROCEED
                          * [!] Else the script depth will be out of order and execution will stop.
                          */
-                        if(isset($this->Control_Flow_Database[$Script_Depth_Minus][$Old_Script_Access]) === True and isset($this->Control_Flow_Database[$Script_Depth_Minus][$Old_Script_Access][$Sub_Depth_Start]) === False and isset($this->Control_Flow_Database[$Script_Depth][$Current_Script_Access][0]) === True and isset($this->Shadow_Control_Flow_Database[$Script_Depth_Minus][$Old_Script_Access][$this->Sub_Script_Depth+1]) === False and isset($this->Shadow_Control_Flow_Database[$Script_Depth][$Current_Script_Access][0]) === False and isset($this->Shadow_Control_Flow_Database[$Script_Depth][$Current_Script_Access][$this->Sub_Script_Depth+1]) === False)
+                        if(isset($Old_Script_Access) === True and is_string($Old_Script_Access) === True and isset($this->Control_Flow_Database[$Script_Depth_Minus][$Old_Script_Access]) === True and isset($this->Control_Flow_Database[$Script_Depth_Minus][$Old_Script_Access][$Sub_Depth_Start]) === False and isset($this->Control_Flow_Database[$Script_Depth][$Current_Script_Access][0]) === True and isset($this->Shadow_Control_Flow_Database[$Script_Depth_Minus][$Old_Script_Access][$this->Sub_Script_Depth+1]) === False and isset($this->Shadow_Control_Flow_Database[$Script_Depth][$Current_Script_Access][0]) === False and isset($this->Shadow_Control_Flow_Database[$Script_Depth][$Current_Script_Access][$this->Sub_Script_Depth+1]) === False)
                         {
                             echo PHP_EOL.' [ + ] ( Sub_Script_Depth )                 Changing Script Depth to the begin of a script depth.';
                             $this->Sub_Script_Depth = 0;
@@ -721,12 +719,12 @@ namespace iZiTA
                     }elseif($is_Sub_Script_Depth === $Set_SSD)
                     {# Set up the next Sub_Script_Depth
                         if(isset($this->Control_Flow_Database[$Script_Depth][$Current_Script_Access][$is_Sub_Script_Depth]) === True and isset($this->Shadow_Control_Flow_Database[$Script_Depth][$Current_Script_Access][$is_Sub_Script_Depth]) === False and isset($this->Shadow_Control_Flow_Database[$Script_Depth][$Current_Script_Access][$is_Sub_Script_Depth-1]) === True)
-                        {# If next Sub_Script_Depth that is to be enrolled is in readonly Control_Flow_Database database and isn't in Shadow_Control_Flow_Database and on Shadow the current one exist
+                        {# If next Sub_Script_Depth that is to be enrolled is in Control_Flow_Database database and isn't in Shadow_Control_Flow_Database and on Shadow the current one exist.
                             $is_to_Enroll = False;
                             if(isset($this->Shadow_Control_Flow_Database[$Script_Depth][$Current_Script_Access][$is_Sub_Script_Depth - 2]) === True)
-                            {# [$is_Sub_Script_Depth - 2]
+                            {# Verify that -2 is set before changing sub script depth to the next (the current) value.
                                 $is_Registered = current((current(($this->Shadow_Control_Flow_Database[$Script_Depth][$Current_Script_Access][$is_Sub_Script_Depth - 2] ?? [])) ?? []));
-                                if(isset($is_Registered[63]) === True)
+                                if(isset($is_Registered) === True and is_string($is_Registered) === True and isset($is_Registered[63]) === True)
                                 {
                                     $is_to_Enroll = True;
                                 }
@@ -739,7 +737,7 @@ namespace iZiTA
                                 if($this->Sub_Script_Depth < 9999)
                                 {
                                     echo PHP_EOL.' [ + ] ( Sub_Script_Depth )                 Adding +1 to Sub_Script_Depth.';
-                                    $this->Sub_Script_Depth += 1;
+                                    $this->Sub_Script_Depth++;
                                     $tmp_void = ($this->Shadow_Enroll_Guard ?? False) ?: False;
                                 }else
                                 {
@@ -747,11 +745,11 @@ namespace iZiTA
                                 }
                             }else
                             {
-                                echo PHP_EOL.' [ !! ] ( Sub_Script_Depth )                The Sub_Script_Depth isn\'t to be enrolled my b.';
+                                echo PHP_EOL.' [ ! ] ( Sub_Script_Depth )                 The Sub_Script_Depth isn\'t to be enrolled. Incorrect Execution Flow.';
                             }
                         }else
                         {
-                            echo PHP_EOL.' [ ! ] ( Sub_Script_Depth )                 Not setting value.';
+                            echo PHP_EOL.' [ !! ] ( Sub_Script_Depth )                The Sub_Script_Depth isn\'t to be enrolled. Incorrect Execution Path.';
                         }
                     }else
                     {
